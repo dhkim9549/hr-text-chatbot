@@ -1,0 +1,1317 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>인사규정 Markdown 챗봇</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #eef2f5;
+      --panel: #ffffff;
+      --ink: #16202a;
+      --muted: #657382;
+      --line: #d8e1e8;
+      --accent: #0c6b5f;
+      --accent-2: #24547a;
+      --accent-soft: #e8f4f1;
+      --blue-soft: #e9f1f8;
+      --warn: #7a4d00;
+      --mark: #fff0a6;
+      --shadow: 0 18px 50px rgba(19, 35, 51, .11);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    button,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    main {
+      width: min(1240px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 36px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(300px, 370px) minmax(0, 1fr);
+      gap: 16px;
+      min-height: calc(100vh - 58px);
+    }
+
+    .sidebar,
+    .chat {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .brand-badge {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .status {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 7px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #273744;
+    }
+
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #bdcad5;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 154px;
+      resize: vertical;
+      padding: 13px;
+    }
+
+    select {
+      min-height: 42px;
+      padding: 0 11px;
+    }
+
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(12, 107, 95, .16);
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 104px;
+      gap: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      min-height: 42px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .primary {
+      flex: 1;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .primary:hover {
+      background: #09584e;
+    }
+
+    .secondary {
+      background: #fff;
+      border-color: var(--line);
+      color: #2c3b49;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 20px;
+    }
+
+    .quick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .quick button {
+      min-height: 30px;
+      padding: 0 10px;
+      border-color: #bdd5d0;
+      background: var(--accent-soft);
+      color: #0a5048;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .metrics {
+      display: grid;
+      gap: 7px;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .source-docs {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .source-docs a {
+      display: block;
+      padding: 9px 10px;
+      border: 1px solid #c8d9e7;
+      border-radius: 8px;
+      background: #f7fbff;
+      color: #19384f;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-decoration: none;
+    }
+
+    .source-docs a:hover {
+      border-color: #9bbad3;
+      background: #eef6fc;
+    }
+
+    .chat {
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      min-width: 0;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .answer-count {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .messages {
+      overflow: auto;
+      padding: 20px;
+    }
+
+    .flow-panel {
+      padding: 18px 20px 20px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f7faf9 100%);
+    }
+
+    .flow-kicker {
+      margin: 0 0 6px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .flow-panel h3 {
+      margin: 0 0 14px;
+      font-size: 17px;
+      line-height: 1.3;
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 96px;
+      padding: 12px;
+      border: 1px solid #cddbe2;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -9px;
+      z-index: 1;
+      width: 9px;
+      height: 2px;
+      background: #9fb8c6;
+    }
+
+    .flow-index {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      margin-bottom: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .flow-title {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.3;
+    }
+
+    .flow-copy {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .empty {
+      min-height: 440px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      padding: 24px;
+    }
+
+    .turn {
+      display: grid;
+      gap: 12px;
+      max-width: 920px;
+    }
+
+    .bubble {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 15px 16px;
+      background: #fff;
+      overflow-wrap: anywhere;
+    }
+
+    .bubble.user {
+      justify-self: end;
+      max-width: min(720px, 92%);
+      background: var(--blue-soft);
+      border-color: #c8d9e7;
+    }
+
+    .bubble.assistant {
+      background: var(--accent-soft);
+      border-color: #c4dcd7;
+    }
+
+    .bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    .answer {
+      white-space: pre-wrap;
+    }
+
+    .thinking {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .thinking.is-active {
+      display: flex;
+    }
+
+    .thinking::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border: 2px solid #b9d4e9;
+      border-top-color: var(--accent-2);
+      border-radius: 999px;
+      animation: spin .85s linear infinite;
+    }
+
+    .ai-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .ai-note.error {
+      color: var(--warn);
+    }
+
+    .usage-cost {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+      padding: 12px;
+      border: 1px solid #c8d9e7;
+      border-radius: 8px;
+      background: #f7fbff;
+    }
+
+    .usage-cost span {
+      display: block;
+    }
+
+    .usage-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .usage-value {
+      margin-top: 2px;
+      color: #19384f;
+      font-size: 14px;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .usage-cost .usage-wide {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .evidence-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .api-input {
+      border: 1px solid #d5c7a4;
+      border-radius: 8px;
+      background: #fffdf6;
+      overflow: hidden;
+    }
+
+    .api-input summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 15px;
+      color: #5b4213;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .api-input summary::after {
+      content: "열기";
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .api-input[open] summary::after {
+      content: "닫기";
+    }
+
+    .api-input pre {
+      max-height: 420px;
+      margin: 0;
+      padding: 14px 15px;
+      overflow: auto;
+      border-top: 1px solid #eadfbd;
+      background: #fffaf0;
+      color: #2c261b;
+      font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .reasoning {
+      border: 1px solid #c8d9e7;
+      border-radius: 8px;
+      background: #f7fbff;
+      overflow: hidden;
+    }
+
+    .reasoning h3 {
+      margin: 0;
+      padding: 13px 15px;
+      border-bottom: 1px solid #d7e4ee;
+      background: #eef6fc;
+      color: #1d4668;
+    }
+
+    .reasoning-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-bottom: 1px solid #d7e4ee;
+    }
+
+    .reasoning-cell {
+      min-width: 0;
+      padding: 12px 15px;
+      border-right: 1px solid #d7e4ee;
+    }
+
+    .reasoning-cell:last-child {
+      border-right: 0;
+    }
+
+    .reasoning-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .reasoning-value {
+      display: block;
+      font-size: 14px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .reasoning ol,
+    .reasoning ul {
+      margin: 0;
+      padding: 13px 15px 13px 36px;
+    }
+
+    .reasoning li {
+      margin: 0 0 8px;
+    }
+
+    .reasoning li:last-child {
+      margin-bottom: 0;
+    }
+
+    .evidence {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .evidence button {
+      display: block;
+      width: 100%;
+      min-height: 0;
+      padding: 13px 15px;
+      border: 0;
+      border-radius: 0;
+      background: #fbfcfd;
+      color: inherit;
+      text-align: left;
+    }
+
+    .evidence button:hover {
+      background: #f2f7f6;
+    }
+
+    .evidence-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .source {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .score {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .snippet,
+    .full {
+      margin: 0;
+      padding: 14px 15px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+    }
+
+    .full {
+      display: none;
+      border-top: 1px solid var(--line);
+      background: #fcfdfd;
+      line-height: 1.72;
+    }
+
+    .full .table-wrap {
+      margin: 6px 0 12px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .full table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      white-space: normal;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .full th,
+    .full td {
+      padding: 8px 10px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .full th:last-child,
+    .full td:last-child {
+      border-right: 0;
+    }
+
+    .full tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .full th {
+      background: #f7fbff;
+      color: #19384f;
+      font-weight: 900;
+    }
+
+    .evidence.is-open .full {
+      display: block;
+    }
+
+    mark {
+      border-radius: 4px;
+      padding: 0 2px;
+      background: var(--mark);
+      color: inherit;
+    }
+
+    .notice {
+      margin: 14px 0 0;
+      color: var(--warn);
+      font-size: 12px;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        width: min(100% - 20px, 680px);
+        padding-top: 10px;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .sidebar {
+        min-height: auto;
+      }
+
+      .row,
+      .chat-header,
+      .evidence-title,
+      .reasoning-grid,
+      .flow-grid,
+      .usage-cost {
+        display: block;
+      }
+
+      .usage-cost > div {
+        margin-bottom: 8px;
+      }
+
+      .usage-cost > div:last-child {
+        margin-bottom: 0;
+      }
+
+      .flow-step {
+        min-height: 0;
+        margin-bottom: 8px;
+      }
+
+      .flow-step:not(:last-child)::after {
+        top: auto;
+        right: auto;
+        bottom: -8px;
+        left: 23px;
+        width: 2px;
+        height: 8px;
+      }
+
+      .reasoning-cell {
+        border-right: 0;
+        border-bottom: 1px solid #d7e4ee;
+      }
+
+      .reasoning-cell:last-child {
+        border-bottom: 0;
+      }
+
+      .answer-count,
+      .score {
+        display: block;
+        margin-top: 6px;
+        text-align: left;
+        white-space: normal;
+      }
+
+      textarea {
+        min-height: 116px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a href="https://github.com/dhkim9549" style="display:inline-flex;margin:24px 0 0 24px;color:inherit;text-decoration:none;font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:.78rem;">github.com/dhkim9549</a>
+    <div class="app">
+      <aside class="sidebar" aria-labelledby="page-title">
+        <div class="brand">
+          <div class="brand-badge" aria-hidden="true">HR</div>
+          <div>
+            <h1 id="page-title">인사규정 Markdown 챗봇</h1>
+            <p class="status" id="load-status">Markdown 지식베이스 불러오는 중</p>
+          </div>
+        </div>
+
+        <form id="chat-form">
+          <div class="field">
+            <label for="question">질문</label>
+            <textarea id="question" name="question" placeholder="예: 육아휴직 기간은 어떻게 되나요?"></textarea>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="revision">전송 범위</label>
+              <select id="revision" name="revision"></select>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="primary" type="submit">질문하기</button>
+            <button class="secondary" type="button" id="clear">초기화</button>
+          </div>
+          <div class="thinking" id="thinking">AI 추론 중</div>
+        </form>
+
+        <div class="sidebar-footer">
+          <label>빠른 질문</label>
+          <div class="quick" id="quick-questions"></div>
+          <label style="margin-top:18px;">원문 Markdown</label>
+          <div class="source-docs" id="source-docs"></div>
+          <div class="metrics" id="metrics">
+            <span>대기 중</span>
+          </div>
+        </div>
+      </aside>
+
+      <section class="chat" aria-live="polite">
+        <div class="chat-header">
+          <h2>대화</h2>
+          <div class="answer-count" id="answer-count">질문을 입력하세요</div>
+        </div>
+        <section class="flow-panel" id="data-flow" aria-label="데이터 처리 흐름">
+          <p class="flow-kicker">Data Flow</p>
+          <h3>서버가 HwpForge Markdown 자료를 읽어 OpenAI 답변, 근거, 비용을 표시합니다</h3>
+          <div class="flow-grid">
+            <div class="flow-step">
+              <span class="flow-index">1</span>
+              <span class="flow-title">HWP 원본들</span>
+              <span class="flow-copy">인사규정, 보수 및 퇴직금 규정</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">2</span>
+              <span class="flow-title">HwpForge</span>
+              <span class="flow-copy">HWP → HWPX → Markdown 변환</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">3</span>
+              <span class="flow-title">Markdown 데이터</span>
+              <span class="flow-copy">/data 폴더에 게시</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">4</span>
+              <span class="flow-title">브라우저</span>
+              <span class="flow-copy">질문과 전송 범위만 보냄</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">5</span>
+              <span class="flow-title">API 프록시</span>
+              <span class="flow-copy">선택된 Markdown을 서버에서 읽음</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">6</span>
+              <span class="flow-title">OpenAI</span>
+              <span class="flow-copy">답변, 인용, 토큰 사용량 반환</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">7</span>
+              <span class="flow-title">화면 표시</span>
+              <span class="flow-copy">답변, 근거, 토큰/비용 렌더링</span>
+            </div>
+          </div>
+        </section>
+        <div class="messages" id="messages">
+          <div class="empty">서버의 Markdown 자료를 API에서 읽어 답변을 생성합니다.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const quickQuestions = [
+      "육아휴직 기간은?",
+      "파견은 언제 가능한가요?",
+      "수습기간 규정은?",
+      "복직 신청 기한은?",
+      "지각 하면 어떻게 되나요?",
+      "육아휴직 2년 넘으면 승진은?",
+      "명예퇴직은 어떤 경우 신청 가능해?"
+    ];
+
+    const state = {
+      sources: [],
+      latestRevision: ""
+    };
+
+    const form = document.querySelector("#chat-form");
+    const questionInput = document.querySelector("#question");
+    const revisionSelect = document.querySelector("#revision");
+    const messages = document.querySelector("#messages");
+    const answerCount = document.querySelector("#answer-count");
+    const loadStatus = document.querySelector("#load-status");
+    const metrics = document.querySelector("#metrics");
+    const quickQuestionBox = document.querySelector("#quick-questions");
+    const sourceDocs = document.querySelector("#source-docs");
+    const thinking = document.querySelector("#thinking");
+
+    function tokenize(value) {
+      const normalized = String(value || "")
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s]/gu, " ");
+      const raw = normalized.split(/\s+/).filter(Boolean);
+      const tokens = [];
+
+      raw.forEach((token) => {
+        if (token.length >= 2) tokens.push(token);
+        if (/[\uac00-\ud7a3]/.test(token) && token.length >= 3) {
+          for (let i = 0; i <= token.length - 2; i += 1) {
+            tokens.push(token.slice(i, i + 2));
+          }
+          if (token.length >= 4) {
+            for (let i = 0; i <= token.length - 3; i += 1) {
+              tokens.push(token.slice(i, i + 3));
+            }
+          }
+        }
+      });
+
+      return [...new Set(tokens.filter((token) => token.length >= 2))];
+    }
+
+    async function requestAiReasoning(question, revision) {
+      const response = await fetch("api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question,
+          revision
+        })
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload.answer) {
+        throw new Error(payload.error || "AI 추론 응답을 받을 수 없습니다.");
+      }
+      return payload;
+    }
+
+    function applyAiAnswer(payload, queryTokens) {
+      const answerBubble = messages.querySelector(".bubble.assistant.answer");
+      if (!answerBubble) return;
+      const steps = Array.isArray(payload.reasoning_steps) && payload.reasoning_steps.length
+        ? `\n\n판단 요약\n${payload.reasoning_steps.map((step, index) => `${index + 1}. ${step}`).join("\n")}`
+        : "";
+      const caveats = Array.isArray(payload.caveats) && payload.caveats.length
+        ? `\n\n확인 필요\n${payload.caveats.map((item) => `- ${item}`).join("\n")}`
+        : "";
+      answerBubble.innerHTML = `${renderMarkdown(payload.answer + steps + caveats, queryTokens)}<p class="ai-note">서버가 선택된 Markdown 자료를 읽어 OpenAI Responses API로 생성한 답변입니다.</p>`;
+      renderUsageCost(payload.usage_cost);
+      renderEvidence(payload.evidence, queryTokens);
+      renderOpenAiInput(payload.openai_request);
+      renderOpenAiOutput(payload.openai_response);
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat("en-US").format(Number(value || 0));
+    }
+
+    function formatUsd(value) {
+      return `$${Number(value || 0).toFixed(5)}`;
+    }
+
+    function renderUsageCost(usageCost) {
+      const turn = messages.querySelector(".turn");
+      const answerBubble = messages.querySelector(".bubble.assistant.answer");
+      if (!turn || !answerBubble || !usageCost) return;
+      const existing = turn.querySelector(".usage-cost");
+      if (existing) existing.remove();
+
+      const rates = usageCost.rates_per_million || {};
+      const card = document.createElement("section");
+      card.className = "usage-cost";
+      card.setAttribute("aria-label", "API token usage and cost");
+      card.innerHTML = `
+        <div>
+          <span class="usage-label">Input Tokens</span>
+          <span class="usage-value">${formatNumber(usageCost.input_tokens)}</span>
+        </div>
+        <div>
+          <span class="usage-label">Output Tokens</span>
+          <span class="usage-value">${formatNumber(usageCost.output_tokens)}</span>
+        </div>
+        <div>
+          <span class="usage-label">Total Tokens</span>
+          <span class="usage-value">${formatNumber(usageCost.total_tokens)}</span>
+        </div>
+        <div>
+          <span class="usage-label">Estimated Cost</span>
+          <span class="usage-value">${formatUsd(usageCost.total_cost)}</span>
+        </div>
+        <div class="usage-wide">
+          Model ${escapeHtml(usageCost.model || "")}; rates per 1M tokens: input ${formatUsd(rates.input)}, cached input ${formatUsd(rates.cached_input)}, output ${formatUsd(rates.output)}.
+        </div>
+      `;
+      answerBubble.insertAdjacentElement("afterend", card);
+    }
+
+    function renderEvidence(evidence, queryTokens) {
+      const turn = messages.querySelector(".turn");
+      const answerBubble = messages.querySelector(".bubble.assistant.answer");
+      if (!turn || !answerBubble || !Array.isArray(evidence) || !evidence.length) return;
+      const existing = turn.querySelector(".evidence-list");
+      if (existing) existing.remove();
+
+      const list = document.createElement("div");
+      list.className = "evidence-list";
+      list.innerHTML = evidence.map((item, index) => `
+        <article class="evidence is-open">
+          <button type="button" aria-expanded="true">
+            <div class="evidence-title">
+              <div>
+                <h3>${escapeHtml(item.title || `관련 원문 ${index + 1}`)}</h3>
+                <p class="source">${escapeHtml(item.source || "인사규정 Markdown")} · 개정 ${escapeHtml(item.revision || "")}</p>
+              </div>
+              <div class="score">원문 닫기</div>
+            </div>
+          </button>
+          <div class="full">${renderMarkdown(item.excerpt || "", queryTokens)}</div>
+        </article>
+      `).join("");
+
+      answerBubble.insertAdjacentElement("afterend", list);
+    }
+
+    function showAiError(message) {
+      const answerBubble = messages.querySelector(".bubble.assistant.answer");
+      if (!answerBubble || answerBubble.querySelector(".ai-note")) return;
+      const note = document.createElement("p");
+      note.className = "ai-note error";
+      note.textContent = `AI 추론 비활성: ${message}`;
+      answerBubble.appendChild(note);
+    }
+
+    function renderOpenAiInput(openaiRequest) {
+      const turn = messages.querySelector(".turn");
+      const answerBubble = messages.querySelector(".bubble.assistant.answer");
+      if (!turn || !answerBubble || !openaiRequest) return;
+      const existing = turn.querySelector(".api-input");
+      if (existing) existing.remove();
+
+      const panel = document.createElement("details");
+      panel.className = "api-input";
+      panel.innerHTML = `
+        <summary>OpenAI API 입력</summary>
+        <pre>${escapeHtml(JSON.stringify(openaiRequest, null, 2))}</pre>
+      `;
+
+      const evidenceList = turn.querySelector(".evidence-list");
+      if (evidenceList) {
+        evidenceList.insertAdjacentElement("afterend", panel);
+      } else {
+        answerBubble.insertAdjacentElement("afterend", panel);
+      }
+    }
+
+    function renderOpenAiOutput(openaiResponse) {
+      const turn = messages.querySelector(".turn");
+      if (!turn || !openaiResponse) return;
+      const existing = turn.querySelector(".api-output");
+      if (existing) existing.remove();
+
+      const panel = document.createElement("details");
+      panel.className = "api-input api-output";
+      panel.innerHTML = `
+        <summary>OpenAI API 출력</summary>
+        <pre>${escapeHtml(JSON.stringify(openaiResponse, null, 2))}</pre>
+      `;
+
+      const inputPanel = turn.querySelector(".api-input:not(.api-output)");
+      if (inputPanel) {
+        inputPanel.insertAdjacentElement("afterend", panel);
+      } else {
+        turn.appendChild(panel);
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function restoreAllowedHtml(value) {
+      return value
+        .replace(/&lt;(\/?)strong&gt;/gi, "<$1strong>")
+        .replace(/&lt;(\/?)b&gt;/gi, "<$1strong>")
+        .replace(/&lt;(\/?)em&gt;/gi, "<$1em>")
+        .replace(/&lt;(\/?)i&gt;/gi, "<$1em>")
+        .replace(/&lt;(\/?)u&gt;/gi, "<$1u>")
+        .replace(/&lt;(\/?)sup&gt;/gi, "<$1sup>")
+        .replace(/&lt;(\/?)sub&gt;/gi, "<$1sub>")
+        .replace(/&lt;br\s*\/?&gt;/gi, "<br>");
+    }
+
+    function highlight(text, tokens) {
+      const targets = tokens
+        .filter((token) => token.length >= 2)
+        .sort((a, b) => b.length - a.length)
+        .slice(0, 20);
+      const lower = text.toLowerCase();
+      const ranges = [];
+
+      targets.forEach((token) => {
+        const needle = token.toLowerCase();
+        let start = lower.indexOf(needle);
+        while (start >= 0) {
+          const end = start + needle.length;
+          if (!ranges.some((range) => start < range.end && end > range.start)) {
+            ranges.push({ start, end });
+          }
+          start = lower.indexOf(needle, end);
+        }
+      });
+
+      if (!ranges.length) return escapeHtml(text);
+      ranges.sort((a, b) => a.start - b.start);
+
+      let html = "";
+      let cursor = 0;
+      ranges.forEach((range) => {
+        html += escapeHtml(text.slice(cursor, range.start));
+        html += `<mark>${escapeHtml(text.slice(range.start, range.end))}</mark>`;
+        cursor = range.end;
+      });
+      return html + escapeHtml(text.slice(cursor));
+    }
+
+    function renderInlineMarkdown(text, tokens) {
+      return restoreAllowedHtml(highlight(text, tokens)
+        .replace(/`([^`\n]+)`/g, "<code>$1</code>")
+        .replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/__([\s\S]+?)__/g, "<strong>$1</strong>")
+        .replace(/(^|[^\*])\*([^\*\n]+)\*/g, "$1<em>$2</em>")
+        .replace(/(^|[^_])_([^_\n]+)_/g, "$1<em>$2</em>"));
+    }
+
+    function isTableDivider(line) {
+      return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line);
+    }
+
+    function splitTableRow(line) {
+      return line
+        .trim()
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map((cell) => cell.trim());
+    }
+
+    function renderTable(lines, start, tokens) {
+      const header = splitTableRow(lines[start]);
+      const rows = [];
+      let cursor = start + 2;
+
+      while (cursor < lines.length && /^\s*\|/.test(lines[cursor]) && !isTableDivider(lines[cursor])) {
+        rows.push(splitTableRow(lines[cursor]));
+        cursor += 1;
+      }
+
+      const thead = `<thead><tr>${header.map((cell) => `<th>${renderInlineMarkdown(cell, tokens)}</th>`).join("")}</tr></thead>`;
+      const tbody = rows
+        .map((row) => `<tr>${header.map((_, index) => `<td>${renderInlineMarkdown(row[index] || "", tokens)}</td>`).join("")}</tr>`)
+        .join("");
+
+      return {
+        html: `<div class="table-wrap"><table>${thead}<tbody>${tbody}</tbody></table></div>`,
+        next: cursor
+      };
+    }
+
+    function renderMarkdown(text, tokens) {
+      const lines = String(text || "").replace(/\r\n/g, "\n").split("\n");
+      const html = [];
+
+      for (let i = 0; i < lines.length; i += 1) {
+        if (/^\s*\|/.test(lines[i]) && lines[i + 1] && isTableDivider(lines[i + 1])) {
+          const table = renderTable(lines, i, tokens);
+          html.push(table.html);
+          i = table.next - 1;
+          continue;
+        }
+        html.push(renderInlineMarkdown(lines[i], tokens));
+      }
+
+      return html.join("\n");
+    }
+
+    function renderEmpty(message) {
+      messages.innerHTML = `<div class="empty">${escapeHtml(message)}</div>`;
+    }
+
+    function renderPending(question) {
+      answerCount.textContent = "AI 답변 생성 중";
+      messages.innerHTML = `
+        <div class="turn">
+          <div class="bubble user">${escapeHtml(question)}</div>
+          <div class="bubble assistant answer">서버에서 Markdown 자료를 읽어 답변을 생성하는 중입니다.</div>
+        </div>
+      `;
+    }
+
+    async function answerQuestion() {
+      const question = questionInput.value;
+      const queryTokens = tokenize(question);
+      const selectedRevision = revisionSelect.value;
+
+      if (!question.trim()) {
+        answerCount.textContent = "질문을 입력하세요";
+        renderEmpty("서버의 Markdown 자료를 API에서 읽어 답변을 생성합니다.");
+        return;
+      }
+
+      if (!state.sources.length) {
+        answerCount.textContent = "자료 없음";
+        renderEmpty("서버에서 사용할 Markdown 자료가 없습니다.");
+        return;
+      }
+
+      renderPending(question);
+      thinking.classList.add("is-active");
+      try {
+        const payload = await requestAiReasoning(question, selectedRevision);
+        applyAiAnswer(payload, queryTokens);
+        answerCount.textContent = "AI 답변 완료";
+      } catch (error) {
+        showAiError(error.message);
+        answerCount.textContent = "AI 답변 실패";
+      } finally {
+        thinking.classList.remove("is-active");
+      }
+    }
+
+    function populateControls() {
+      const revisions = state.sources
+        .map((source) => ({ revision: source.revision, file: source.file, title: source.title }))
+        .sort((a, b) => b.revision.localeCompare(a.revision));
+      state.latestRevision = revisions[0] ? revisions[0].revision : "";
+
+      revisionSelect.innerHTML = [
+        '<option value="all">전체 자료</option>',
+        ...revisions.map((doc) => `<option value="${doc.revision}">${doc.revision} · ${escapeHtml(doc.title || doc.file.replace(/\.hwpforge\.md$/, ""))}</option>`)
+      ].join("");
+
+      quickQuestionBox.innerHTML = quickQuestions
+        .map((question) => `<button type="button" data-question="${escapeHtml(question)}">${escapeHtml(question)}</button>`)
+        .join("");
+
+      sourceDocs.innerHTML = revisions
+        .map((doc) => {
+          const title = doc.title || doc.file.replace(/\.hwpforge\.md$/, "");
+          return `<a href="data/${encodeURIComponent(doc.file)}" target="_blank" rel="noopener noreferrer">${escapeHtml(doc.revision)} · ${escapeHtml(title)}</a>`;
+        })
+        .join("");
+    }
+
+    async function loadData() {
+      try {
+        const response = await fetch("api/sources");
+        if (!response.ok) throw new Error("서버 자료 목록 로드 실패");
+        const payload = await response.json();
+        const sources = Array.isArray(payload.sources) ? payload.sources : [];
+
+        state.sources = sources;
+        populateControls();
+
+        loadStatus.textContent = `최신 자료 ${state.latestRevision}`;
+        metrics.innerHTML = `
+          <span>${state.sources.length}개 Markdown 파일</span>
+          <span>문서는 서버에서 읽음</span>
+        `;
+
+        const initial = new URLSearchParams(window.location.search).get("q");
+        if (initial) {
+          questionInput.value = initial;
+          answerQuestion();
+        }
+      } catch (error) {
+        loadStatus.textContent = "자료 로드 실패";
+        metrics.innerHTML = `<span>${escapeHtml(error.message)}</span>`;
+        renderEmpty(error.message);
+      }
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      answerQuestion();
+    });
+
+    document.querySelector("#clear").addEventListener("click", () => {
+      questionInput.value = "";
+      answerCount.textContent = "질문을 입력하세요";
+      renderEmpty("서버의 Markdown 자료를 API에서 읽어 답변을 생성합니다.");
+      questionInput.focus();
+    });
+
+    quickQuestionBox.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-question]");
+      if (!button) return;
+      questionInput.value = button.dataset.question;
+      answerQuestion();
+    });
+
+    messages.addEventListener("click", (event) => {
+      const button = event.target.closest(".evidence button");
+      if (!button) return;
+      const item = button.closest(".evidence");
+      const open = item.classList.toggle("is-open");
+      button.setAttribute("aria-expanded", String(open));
+      const score = button.querySelector(".score");
+      if (score) score.textContent = open ? "원문 닫기" : "원문 보기";
+    });
+
+    loadData();
+  </script>
+</body>
+</html>

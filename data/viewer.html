@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Markdown 원문</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #eef2f5;
+      --panel: #ffffff;
+      --ink: #16202a;
+      --muted: #657382;
+      --line: #d8e1e8;
+      --accent: #0c6b5f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .back {
+      display: inline-flex;
+      margin-bottom: 12px;
+      color: #263746;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-decoration: none;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(19, 35, 51, .1);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    .raw-link {
+      flex: 0 0 auto;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .doc {
+      min-height: 60vh;
+      padding: 20px;
+      overflow: auto;
+      color: var(--ink);
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .doc h1,
+    .doc h2,
+    .doc h3,
+    .doc h4 {
+      margin: 28px 0 12px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .doc h1:first-child,
+    .doc h2:first-child,
+    .doc h3:first-child,
+    .doc h4:first-child {
+      margin-top: 0;
+    }
+
+    .doc h1 {
+      font-size: 24px;
+    }
+
+    .doc h2 {
+      font-size: 21px;
+    }
+
+    .doc h3 {
+      font-size: 18px;
+    }
+
+    .doc h4 {
+      font-size: 16px;
+    }
+
+    .doc p {
+      margin: 0 0 14px;
+    }
+
+    .doc ul,
+    .doc ol {
+      margin: 0 0 16px;
+      padding-left: 28px;
+    }
+
+    .doc li {
+      margin: 0 0 6px;
+    }
+
+    .doc blockquote {
+      margin: 0 0 16px;
+      padding: 10px 14px;
+      border-left: 4px solid #bdd5d0;
+      background: #f7fbff;
+      color: #263746;
+    }
+
+    .doc code {
+      border-radius: 4px;
+      padding: 1px 4px;
+      background: #eef2f5;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: .92em;
+    }
+
+    .doc pre {
+      margin: 0 0 16px;
+      padding: 14px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f7fbff;
+      white-space: pre-wrap;
+    }
+
+    .doc pre code {
+      padding: 0;
+      background: transparent;
+      font-size: 13px;
+    }
+
+    .table-wrap {
+      margin: 0 0 18px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th:last-child,
+    td:last-child {
+      border-right: 0;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    th {
+      background: #f7fbff;
+      font-weight: 900;
+    }
+
+    .status {
+      color: var(--muted);
+    }
+
+    @media (max-width: 680px) {
+      main {
+        width: min(100% - 20px, 680px);
+        padding-top: 12px;
+      }
+
+      header {
+        display: block;
+      }
+
+      .raw-link {
+        display: inline-block;
+        margin-top: 8px;
+      }
+
+      .doc {
+        padding: 16px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="https://github.com/dhkim9549">github.com/dhkim9549</a>
+    <section class="panel">
+      <header>
+        <h1 id="title">Markdown 원문</h1>
+        <a class="raw-link" id="raw-link" href="#">Raw Markdown</a>
+      </header>
+      <article id="content" class="doc status">문서를 불러오는 중입니다.</article>
+    </section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const file = params.get("file") || "";
+    const title = document.querySelector("#title");
+    const content = document.querySelector("#content");
+    const rawLink = document.querySelector("#raw-link");
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function restoreAllowedHtml(value) {
+      return value
+        .replace(/&lt;(\/?)strong&gt;/gi, "<$1strong>")
+        .replace(/&lt;(\/?)b&gt;/gi, "<$1strong>")
+        .replace(/&lt;(\/?)em&gt;/gi, "<$1em>")
+        .replace(/&lt;(\/?)i&gt;/gi, "<$1em>")
+        .replace(/&lt;(\/?)u&gt;/gi, "<$1u>")
+        .replace(/&lt;(\/?)sup&gt;/gi, "<$1sup>")
+        .replace(/&lt;(\/?)sub&gt;/gi, "<$1sub>")
+        .replace(/&lt;br\s*\/?&gt;/gi, "<br>");
+    }
+
+    function renderInline(value) {
+      return restoreAllowedHtml(escapeHtml(value))
+        .replace(/`([^`\n]+)`/g, "<code>$1</code>")
+        .replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/__([\s\S]+?)__/g, "<strong>$1</strong>")
+        .replace(/(^|[^\*])\*([^\*\n]+)\*/g, "$1<em>$2</em>")
+        .replace(/(^|[^_])_([^_\n]+)_/g, "$1<em>$2</em>");
+    }
+
+    function isTableDivider(line) {
+      return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line);
+    }
+
+    function splitTableRow(line) {
+      return line
+        .trim()
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map((cell) => cell.trim());
+    }
+
+    function renderTable(lines, start) {
+      const header = splitTableRow(lines[start]);
+      let cursor = start + 2;
+      const rows = [];
+
+      while (cursor < lines.length && /^\s*\|/.test(lines[cursor]) && !isTableDivider(lines[cursor])) {
+        rows.push(splitTableRow(lines[cursor]));
+        cursor += 1;
+      }
+
+      const thead = `<thead><tr>${header.map((cell) => `<th>${renderInline(cell)}</th>`).join("")}</tr></thead>`;
+      const tbody = rows
+        .map((row) => `<tr>${header.map((_, index) => `<td>${renderInline(row[index] || "")}</td>`).join("")}</tr>`)
+        .join("");
+      return {
+        html: `<div class="table-wrap"><table>${thead}<tbody>${tbody}</tbody></table></div>`,
+        next: cursor
+      };
+    }
+
+    function sanitizeHtmlNode(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return document.createTextNode(node.textContent || "");
+      }
+
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return document.createDocumentFragment();
+      }
+
+      const tableTags = new Set(["TABLE", "THEAD", "TBODY", "TFOOT", "TR", "TH", "TD", "CAPTION", "COLGROUP", "COL"]);
+      const inlineTags = new Set(["STRONG", "B", "EM", "I", "U", "SUP", "SUB", "BR"]);
+      const tagName = node.tagName.toUpperCase();
+
+      if (!tableTags.has(tagName) && !inlineTags.has(tagName)) {
+        const fragment = document.createDocumentFragment();
+        node.childNodes.forEach((child) => fragment.appendChild(sanitizeHtmlNode(child)));
+        return fragment;
+      }
+
+      const safeTag = tagName === "B" ? "strong" : tagName === "I" ? "em" : tagName.toLowerCase();
+      const safe = document.createElement(safeTag);
+
+      if (tagName === "TD" || tagName === "TH") {
+        ["colspan", "rowspan"].forEach((name) => {
+          const value = Number.parseInt(node.getAttribute(name) || "", 10);
+          if (Number.isInteger(value) && value > 1 && value <= 100) {
+            safe.setAttribute(name, String(value));
+          }
+        });
+      }
+
+      if (tagName !== "BR" && tagName !== "COL") {
+        node.childNodes.forEach((child) => safe.appendChild(sanitizeHtmlNode(child)));
+      }
+
+      return safe;
+    }
+
+    function renderHtmlTableBlock(lines, start) {
+      const tableLines = [];
+      let cursor = start;
+
+      while (cursor < lines.length) {
+        tableLines.push(lines[cursor]);
+        if (/<\/table\s*>/i.test(lines[cursor])) break;
+        cursor += 1;
+      }
+
+      if (!tableLines.some((line) => /<\/table\s*>/i.test(line))) return null;
+
+      const parsed = new DOMParser().parseFromString(tableLines.join("\n"), "text/html");
+      const table = parsed.body.querySelector("table");
+      if (!table) return null;
+
+      const wrapper = document.createElement("div");
+      wrapper.appendChild(sanitizeHtmlNode(table));
+
+      return {
+        html: `<div class="table-wrap">${wrapper.innerHTML}</div>`,
+        next: cursor + 1
+      };
+    }
+
+    function renderMarkdown(markdown) {
+      const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+      const html = [];
+      let paragraph = [];
+      let list = null;
+      let inCode = false;
+      let codeLines = [];
+
+      function flushParagraph() {
+        if (!paragraph.length) return;
+        html.push(`<p>${renderInline(paragraph.join(" "))}</p>`);
+        paragraph = [];
+      }
+
+      function flushList() {
+        if (!list) return;
+        html.push(`<${list.type}>${list.items.map((item) => `<li>${renderInline(item)}</li>`).join("")}</${list.type}>`);
+        list = null;
+      }
+
+      function flushCode() {
+        html.push(`<pre><code>${escapeHtml(codeLines.join("\n"))}</code></pre>`);
+        codeLines = [];
+      }
+
+      for (let i = 0; i < lines.length; i += 1) {
+        const line = lines[i];
+
+        if (/^\s*```/.test(line)) {
+          if (inCode) {
+            flushCode();
+            inCode = false;
+          } else {
+            flushParagraph();
+            flushList();
+            inCode = true;
+          }
+          continue;
+        }
+
+        if (inCode) {
+          codeLines.push(line);
+          continue;
+        }
+
+        if (/^\s*<table\b/i.test(line)) {
+          flushParagraph();
+          flushList();
+          const table = renderHtmlTableBlock(lines, i);
+          if (table) {
+            html.push(table.html);
+            i = table.next - 1;
+            continue;
+          }
+        }
+
+        if (/^\s*\|/.test(line) && lines[i + 1] && isTableDivider(lines[i + 1])) {
+          flushParagraph();
+          flushList();
+          const table = renderTable(lines, i);
+          html.push(table.html);
+          i = table.next - 1;
+          continue;
+        }
+
+        if (!line.trim()) {
+          flushParagraph();
+          flushList();
+          continue;
+        }
+
+        const heading = line.match(/^(#{1,4})\s+(.+)$/);
+        if (heading) {
+          flushParagraph();
+          flushList();
+          const level = heading[1].length;
+          html.push(`<h${level}>${renderInline(heading[2])}</h${level}>`);
+          continue;
+        }
+
+        const blockquote = line.match(/^\s*>\s?(.+)$/);
+        if (blockquote) {
+          flushParagraph();
+          flushList();
+          html.push(`<blockquote>${renderInline(blockquote[1])}</blockquote>`);
+          continue;
+        }
+
+        const unordered = line.match(/^\s*[-*]\s+(.+)$/);
+        const ordered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+        if (unordered || ordered) {
+          flushParagraph();
+          const type = unordered ? "ul" : "ol";
+          if (!list || list.type !== type) flushList();
+          if (!list) list = { type, items: [] };
+          list.items.push((unordered || ordered)[1]);
+          continue;
+        }
+
+        paragraph.push(line.trim());
+      }
+
+      if (inCode) flushCode();
+      flushParagraph();
+      flushList();
+      return html.join("\n");
+    }
+
+    function setError(message) {
+      content.className = "doc status";
+      content.textContent = message;
+    }
+
+    async function loadMarkdown() {
+      if (!/^[^/\\]+\.md$/.test(file)) {
+        setError("문서 파일 이름이 올바르지 않습니다.");
+        rawLink.removeAttribute("href");
+        return;
+      }
+
+      title.textContent = file.replace(/\.hwpforge\.md$/, "");
+      const rawUrl = `raw/${encodeURIComponent(file)}`;
+      rawLink.href = rawUrl;
+
+      try {
+        const response = await fetch(rawUrl);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const text = await response.text();
+        content.className = "doc";
+        content.innerHTML = renderMarkdown(text);
+      } catch (error) {
+        setError(`문서를 불러올 수 없습니다: ${error.message}`);
+      }
+    }
+
+    loadMarkdown();
+  </script>
+</body>
+</html>

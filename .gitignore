@@ -1,0 +1,10 @@
+.env
+*.log
+node_modules/
+.DS_Store
+*.tmp
+*.bak
+*.hwp
+*.hwpx
+screenshots/
+coverage/

@@ -1,0 +1,1552 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>인사규정 Markdown 챗봇</title>
+  <style>
+    :root {
+      --bg: #eef2f5;
+      --panel: #ffffff;
+      --ink: #16202a;
+      --muted: #657382;
+      --line: #d8e1e8;
+      --accent: #0c6b5f;
+      --accent-2: #24547a;
+      --accent-soft: #e8f4f1;
+      --blue-soft: #e9f1f8;
+      --warn: #7a4d00;
+      --mark: #fff0a6;
+      --shadow: 0 18px 50px rgba(19, 35, 51, .11);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    button,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    main {
+      width: min(1240px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 36px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(300px, 370px) minmax(0, 1fr);
+      gap: 16px;
+      min-height: calc(100vh - 58px);
+    }
+
+    .sidebar,
+    .chat {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .brand-badge {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .status {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 7px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #273744;
+    }
+
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #bdcad5;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 154px;
+      resize: vertical;
+      padding: 13px;
+    }
+
+    select {
+      min-height: 42px;
+      padding: 0 11px;
+    }
+
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(12, 107, 95, .16);
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 104px;
+      gap: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      min-height: 42px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .primary {
+      flex: 1;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .primary:hover {
+      background: #09584e;
+    }
+
+    .secondary {
+      background: #fff;
+      border-color: var(--line);
+      color: #2c3b49;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 20px;
+    }
+
+    .quick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .quick button {
+      min-height: 30px;
+      padding: 0 10px;
+      border-color: #bdd5d0;
+      background: var(--accent-soft);
+      color: #0a5048;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .metrics {
+      display: grid;
+      gap: 7px;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .chat {
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      min-width: 0;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .answer-count {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .messages {
+      overflow: auto;
+      padding: 20px;
+    }
+
+    .flow-panel {
+      padding: 18px 20px 20px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f7faf9 100%);
+    }
+
+    .flow-kicker {
+      margin: 0 0 6px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .flow-panel h3 {
+      margin: 0 0 14px;
+      font-size: 17px;
+      line-height: 1.3;
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 96px;
+      padding: 12px;
+      border: 1px solid #cddbe2;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -9px;
+      z-index: 1;
+      width: 9px;
+      height: 2px;
+      background: #9fb8c6;
+    }
+
+    .flow-index {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      margin-bottom: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .flow-title {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.3;
+    }
+
+    .flow-copy {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .empty {
+      min-height: 440px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      padding: 24px;
+    }
+
+    .turn {
+      display: grid;
+      gap: 12px;
+      max-width: 920px;
+    }
+
+    .bubble {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 15px 16px;
+      background: #fff;
+      overflow-wrap: anywhere;
+    }
+
+    .bubble.user {
+      justify-self: end;
+      max-width: min(720px, 92%);
+      background: var(--blue-soft);
+      border-color: #c8d9e7;
+    }
+
+    .bubble.assistant {
+      background: var(--accent-soft);
+      border-color: #c4dcd7;
+    }
+
+    .bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    .answer {
+      white-space: pre-wrap;
+    }
+
+    .thinking {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .thinking.is-active {
+      display: flex;
+    }
+
+    .thinking::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border: 2px solid #b9d4e9;
+      border-top-color: var(--accent-2);
+      border-radius: 999px;
+      animation: spin .85s linear infinite;
+    }
+
+    .ai-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .ai-note.error {
+      color: var(--warn);
+    }
+
+    .usage-cost {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+      padding: 12px;
+      border: 1px solid #c8d9e7;
+      border-radius: 8px;
+      background: #f7fbff;
+    }
+
+    .usage-cost span {
+      display: block;
+    }
+
+    .usage-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .usage-value {
+      margin-top: 2px;
+      color: #19384f;
+      font-size: 14px;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .usage-cost .usage-wide {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .evidence-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .api-input {
+      border: 1px solid #d5c7a4;
+      border-radius: 8px;
+      background: #fffdf6;
+      overflow: hidden;
+    }
+
+    .api-input summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 15px;
+      color: #5b4213;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .api-input summary::after {
+      content: "열기";
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .api-input[open] summary::after {
+      content: "닫기";
+    }
+
+    .api-input pre {
+      max-height: 420px;
+      margin: 0;
+      padding: 14px 15px;
+      overflow: auto;
+      border-top: 1px solid #eadfbd;
+      background: #fffaf0;
+      color: #2c261b;
+      font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .reasoning {
+      border: 1px solid #c8d9e7;
+      border-radius: 8px;
+      background: #f7fbff;
+      overflow: hidden;
+    }
+
+    .reasoning h3 {
+      margin: 0;
+      padding: 13px 15px;
+      border-bottom: 1px solid #d7e4ee;
+      background: #eef6fc;
+      color: #1d4668;
+    }
+
+    .reasoning-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-bottom: 1px solid #d7e4ee;
+    }
+
+    .reasoning-cell {
+      min-width: 0;
+      padding: 12px 15px;
+      border-right: 1px solid #d7e4ee;
+    }
+
+    .reasoning-cell:last-child {
+      border-right: 0;
+    }
+
+    .reasoning-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .reasoning-value {
+      display: block;
+      font-size: 14px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .reasoning ol,
+    .reasoning ul {
+      margin: 0;
+      padding: 13px 15px 13px 36px;
+    }
+
+    .reasoning li {
+      margin: 0 0 8px;
+    }
+
+    .reasoning li:last-child {
+      margin-bottom: 0;
+    }
+
+    .evidence {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .evidence button {
+      display: block;
+      width: 100%;
+      min-height: 0;
+      padding: 13px 15px;
+      border: 0;
+      border-radius: 0;
+      background: #fbfcfd;
+      color: inherit;
+      text-align: left;
+    }
+
+    .evidence button:hover {
+      background: #f2f7f6;
+    }
+
+    .evidence-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .source {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .score {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .snippet,
+    .full {
+      margin: 0;
+      padding: 14px 15px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+    }
+
+    .full {
+      display: none;
+      border-top: 1px solid var(--line);
+      background: #fcfdfd;
+      line-height: 1.72;
+    }
+
+    .evidence.is-open .full {
+      display: block;
+    }
+
+    mark {
+      border-radius: 4px;
+      padding: 0 2px;
+      background: var(--mark);
+      color: inherit;
+    }
+
+    .notice {
+      margin: 14px 0 0;
+      color: var(--warn);
+      font-size: 12px;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        width: min(100% - 20px, 680px);
+        padding-top: 10px;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .sidebar {
+        min-height: auto;
+      }
+
+      .row,
+      .chat-header,
+      .evidence-title,
+      .reasoning-grid,
+      .flow-grid,
+      .usage-cost {
+        display: block;
+      }
+
+      .usage-cost > div {
+        margin-bottom: 8px;
+      }
+
+      .usage-cost > div:last-child {
+        margin-bottom: 0;
+      }
+
+      .flow-step {
+        min-height: 0;
+        margin-bottom: 8px;
+      }
+
+      .flow-step:not(:last-child)::after {
+        top: auto;
+        right: auto;
+        bottom: -8px;
+        left: 23px;
+        width: 2px;
+        height: 8px;
+      }
+
+      .reasoning-cell {
+        border-right: 0;
+        border-bottom: 1px solid #d7e4ee;
+      }
+
+      .reasoning-cell:last-child {
+        border-bottom: 0;
+      }
+
+      .answer-count,
+      .score {
+        display: block;
+        margin-top: 6px;
+        text-align: left;
+        white-space: normal;
+      }
+
+      textarea {
+        min-height: 116px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a href="https://github.com/dhkim9549" style="display:inline-flex;margin:24px 0 0 24px;color:inherit;text-decoration:none;font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:.78rem;">github.com/dhkim9549</a>
+    <div class="app">
+      <aside class="sidebar" aria-labelledby="page-title">
+        <div class="brand">
+          <div class="brand-badge" aria-hidden="true">HR</div>
+          <div>
+            <h1 id="page-title">인사규정 Markdown 챗봇</h1>
+            <p class="status" id="load-status">Markdown 지식베이스 불러오는 중</p>
+          </div>
+        </div>
+
+        <form id="chat-form">
+          <div class="field">
+            <label for="question">질문</label>
+            <textarea id="question" name="question" placeholder="예: 육아휴직 기간은 어떻게 되나요?"></textarea>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="revision">검색 범위</label>
+              <select id="revision" name="revision"></select>
+            </div>
+            <div class="field">
+              <label for="limit">근거</label>
+              <select id="limit" name="limit">
+                <option value="4">4개</option>
+                <option value="6">6개</option>
+                <option value="8">8개</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="primary" type="submit">질문하기</button>
+            <button class="secondary" type="button" id="clear">초기화</button>
+          </div>
+          <div class="thinking" id="thinking">AI 추론 중</div>
+        </form>
+
+        <div class="sidebar-footer">
+          <label>빠른 질문</label>
+          <div class="quick" id="quick-questions"></div>
+          <div class="metrics" id="metrics">
+            <span>대기 중</span>
+          </div>
+        </div>
+      </aside>
+
+      <section class="chat" aria-live="polite">
+        <div class="chat-header">
+          <h2>대화</h2>
+          <div class="answer-count" id="answer-count">질문을 입력하세요</div>
+        </div>
+        <section class="flow-panel" id="data-flow" aria-label="데이터 처리 흐름">
+          <p class="flow-kicker">Data Flow</p>
+          <h3>HwpForge로 만든 Markdown 자료를 OpenAI에 전달해 답변, 근거, 비용을 표시합니다</h3>
+          <div class="flow-grid">
+            <div class="flow-step">
+              <span class="flow-index">1</span>
+              <span class="flow-title">HWP 원본들</span>
+              <span class="flow-copy">인사규정, 보수 및 퇴직금 규정</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">2</span>
+              <span class="flow-title">HwpForge</span>
+              <span class="flow-copy">HWP → HWPX → Markdown 변환</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">3</span>
+              <span class="flow-title">Markdown 데이터</span>
+              <span class="flow-copy">/data 폴더에 게시</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">4</span>
+              <span class="flow-title">브라우저</span>
+              <span class="flow-copy">Markdown 파일들을 불러옴</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">5</span>
+              <span class="flow-title">API 프록시</span>
+              <span class="flow-copy">질문과 선택된 문서 전달</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">6</span>
+              <span class="flow-title">OpenAI</span>
+              <span class="flow-copy">답변, 인용, 토큰 사용량 반환</span>
+            </div>
+            <div class="flow-step">
+              <span class="flow-index">7</span>
+              <span class="flow-title">화면 표시</span>
+              <span class="flow-copy">답변, 근거, 토큰/비용 렌더링</span>
+            </div>
+          </div>
+        </section>
+        <div class="messages" id="messages">
+          <div class="empty">이 폴더의 인사규정 Markdown 파일을 검색해 답변과 근거를 표시합니다.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const KNOWLEDGE_FILES = [
+      "인사규정(2021년도 7월 개정).hwpforge.md",
+      "보수 및 퇴직금 규정(2025년 1월 개정).hwpforge.md"
+    ];
+
+    const quickQuestions = [
+      "육아휴직 기간은?",
+      "파견은 언제 가능한가요?",
+      "수습기간 규정은?",
+      "복직 신청 기한은?",
+      "지각 하면 어떻게 되나요?",
+      "육아휴직 2년 넘으면 승진은?"
+    ];
+
+    const state = {
+      documents: [],
+      chunks: [],
+      latestRevision: ""
+    };
+
+    const form = document.querySelector("#chat-form");
+    const questionInput = document.querySelector("#question");
+    const revisionSelect = document.querySelector("#revision");
+    const limitSelect = document.querySelector("#limit");
+    const messages = document.querySelector("#messages");
+    const answerCount = document.querySelector("#answer-count");
+    const loadStatus = document.querySelector("#load-status");
+    const metrics = document.querySelector("#metrics");
+    const quickQuestionBox = document.querySelector("#quick-questions");
+    const thinking = document.querySelector("#thinking");
+
+    function revisionKey(name) {
+      const match = name.match(/(\d{4})년(?:도)?\s*(\d{1,2})월(?:\s*(\d{1,2})일)?/);
+      if (!match) return "0000-00-00";
+      return [
+        match[1],
+        match[2].padStart(2, "0"),
+        (match[3] || "01").padStart(2, "0")
+      ].join("-");
+    }
+
+    function normalizeText(value) {
+      return String(value || "")
+        .replace(/\r/g, "")
+        .replace(/\f/g, "\n")
+        .replace(/[ \t]+/g, " ")
+        .replace(/\n[ \t]+/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function tokenize(value) {
+      const normalized = String(value || "")
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s]/gu, " ");
+      const raw = normalized.split(/\s+/).filter(Boolean);
+      const tokens = [];
+
+      raw.forEach((token) => {
+        if (token.length >= 2) tokens.push(token);
+        if (/[\uac00-\ud7a3]/.test(token) && token.length >= 3) {
+          for (let i = 0; i <= token.length - 2; i += 1) {
+            tokens.push(token.slice(i, i + 2));
+          }
+          if (token.length >= 4) {
+            for (let i = 0; i <= token.length - 3; i += 1) {
+              tokens.push(token.slice(i, i + 3));
+            }
+          }
+        }
+      });
+
+      return [...new Set(tokens.filter((token) => token.length >= 2))];
+    }
+
+    function articleTitle(text) {
+      const title = text.match(/제\s*\d+\s*조(?:의\s*\d+)?\s*(?:\([^)]*\)|삭\s*제|삭제[^\n]*)?/);
+      if (title) return title[0].replace(/\s+/g, " ").trim();
+      const chapter = text.match(/제\s*\d+\s*장\s*[^\n]+/);
+      return chapter ? chapter[0].replace(/\s+/g, " ").trim() : "관련 문단";
+    }
+
+    function pageNumbers(text) {
+      const pages = [...text.matchAll(/-\s*(\d{1,3})\s*-/g)].map((match) => match[1]);
+      return [...new Set(pages)];
+    }
+
+    function splitLongBlock(text, maxLength) {
+      if (text.length <= maxLength) return [text];
+      const paragraphs = text.split(/\n{2,}/).map(normalizeText).filter(Boolean);
+      const blocks = [];
+      let current = "";
+
+      paragraphs.forEach((paragraph) => {
+        if ((current + "\n\n" + paragraph).length > maxLength && current) {
+          blocks.push(current);
+          current = paragraph;
+        } else {
+          current = current ? `${current}\n\n${paragraph}` : paragraph;
+        }
+      });
+
+      if (current) blocks.push(current);
+      return blocks;
+    }
+
+    function documentTextFromJson(doc) {
+      if (Array.isArray(doc.pages)) {
+        return doc.pages.map((page) => {
+          const pageNumber = page.page || "";
+          const pageText = normalizeText(
+            Array.isArray(page.paragraphs) && page.paragraphs.length
+              ? page.paragraphs.join("\n\n")
+              : page.text || ""
+          );
+          return `[[PAGE:${pageNumber}]]\n${pageText}`;
+        }).join("\n\n");
+      }
+
+      if (Array.isArray(doc.sections)) {
+        return doc.sections.map((section, index) => {
+          const sectionName = section.name || `Section${index}`;
+          const sectionText = normalizeText(
+            Array.isArray(section.paragraphs) && section.paragraphs.length
+              ? section.paragraphs.join("\n\n")
+              : section.text || ""
+          );
+          return `[[SECTION:${sectionName}]]\n${sectionText}`;
+        }).join("\n\n");
+      }
+
+      return normalizeText(doc.text || "");
+    }
+
+    function splitDocument(doc) {
+      const text = normalizeText(documentTextFromJson(doc));
+      const parts = text
+        .split(/(?=(?:제\s*\d+\s*조(?:의\s*\d+)?\s*(?:\([^)]*\)|삭\s*제|삭제)|제\s*\d+\s*장\s*[^\n]+))/g)
+        .map(normalizeText)
+        .filter((part) => part.length > 25);
+
+      const source = doc.file || doc.source_file || "인사규정 Markdown";
+      const revision = doc.revision;
+      const chunks = [];
+
+      parts.forEach((part, partIndex) => {
+        splitLongBlock(part, 3400).forEach((block, blockIndex) => {
+          const pages = [...new Set([...block.matchAll(/\[\[PAGE:([^\]]*)\]\]/g)]
+            .map((match) => match[1])
+            .filter(Boolean))];
+          const text = normalizeText(block
+            .replace(/\[\[PAGE:[^\]]*\]\]\n?/g, "")
+            .replace(/\[\[SECTION:[^\]]*\]\]\n?/g, ""));
+          if (!text) return;
+          const tokens = tokenize(block);
+          chunks.push({
+            id: `${source}-${partIndex}-${blockIndex}`,
+            source,
+            revision,
+            title: articleTitle(text),
+            text,
+            pages: pages.length ? pages : pageNumbers(text),
+            tokens
+          });
+        });
+      });
+
+      return chunks;
+    }
+
+    function scoreChunk(chunk, queryTokens, question) {
+      if (!queryTokens.length) return 0;
+      const lowerText = chunk.text.toLowerCase();
+      const lowerTitle = chunk.title.toLowerCase();
+      let score = 0;
+
+      queryTokens.forEach((token) => {
+        if (chunk.tokens.includes(token)) score += token.length >= 3 ? 7 : 4;
+        if (lowerText.includes(token)) score += token.length >= 3 ? 5 : 2;
+        if (lowerTitle.includes(token)) score += 10;
+      });
+
+      const compactQuestion = question.replace(/\s+/g, "").toLowerCase();
+      const compactText = chunk.text.replace(/\s+/g, "").toLowerCase();
+      if (compactQuestion.length >= 4 && compactText.includes(compactQuestion)) score += 30;
+
+      if (/(기간|기한|언제|며칠|몇|얼마)/.test(question) && /(기간|기한|이내|초과|\d+\s*(년|개월|월|일))/.test(chunk.text)) {
+        score += 10;
+      }
+
+      if (chunk.revision === state.latestRevision) score += 2;
+      return score;
+    }
+
+    function sentenceCandidates(text) {
+      return normalizeText(text)
+        .replace(/([.。])\s*(?=제\s*\d+\s*항|[①②③④⑤⑥⑦⑧⑨⑩]|\d+\.)/g, "$1\n")
+        .split(/(?<=[.!?。])\s+|\n+/)
+        .map(normalizeText)
+        .filter((item) => item.length > 8);
+    }
+
+    function trimAroundMatch(text, tokens, size = 330) {
+      if (text.length <= size) return text;
+      const lower = text.toLowerCase();
+      const positions = tokens
+        .map((token) => lower.indexOf(token.toLowerCase()))
+        .filter((index) => index >= 0);
+
+      if (!positions.length) return `${text.slice(0, size - 3)}...`;
+      const first = Math.min(...positions);
+      const start = Math.max(0, first - Math.floor(size * .35));
+      const end = Math.min(text.length, start + size);
+      return `${start > 0 ? "..." : ""}${text.slice(start, end)}${end < text.length ? "..." : ""}`;
+    }
+
+    function bestExtract(chunk, queryTokens) {
+      const sentences = sentenceCandidates(chunk.text);
+      const ranked = sentences.map((sentence) => {
+        const lower = sentence.toLowerCase();
+        let score = queryTokens.reduce((sum, token) => sum + (lower.includes(token) ? token.length : 0), 0);
+        if (/(기간|기한|이내|초과|\d+\s*(년|개월|월|일)|[①②③④⑤⑥⑦⑧⑨⑩])/.test(sentence)) score += 4;
+        return { sentence, score };
+      }).sort((a, b) => b.score - a.score);
+
+      const selected = ranked.filter((item) => item.score > 0).slice(0, 3);
+      return (selected.length ? selected : ranked.slice(0, 2))
+        .map((item) => trimAroundMatch(item.sentence, queryTokens))
+        .join("\n");
+    }
+
+    function inferIntent(question) {
+      const text = question.replace(/\s+/g, "");
+      const types = [];
+      if (/(가능|할수|되나|되나요|허가|신청|대상|요건|조건)/.test(text)) types.push("가능 여부");
+      if (/(기간|기한|언제|며칠|몇년|몇개월|얼마)/.test(text)) types.push("기간/기한");
+      if (/(승진|평정|평가|경력|근속|직급|보수|임금)/.test(text)) types.push("인사 영향");
+      if (/(예외|단서|다만|제외|초과|이내|이상|미만)/.test(text)) types.push("예외/제한");
+      if (/(비교|차이|개정|바뀌|변경|전과|이전)/.test(text)) types.push("개정 비교");
+      return types.length ? types : ["규정 검색"];
+    }
+
+    function extractSignals(text) {
+      const sentences = sentenceCandidates(text);
+      const periodPattern = /(?:\d+\s*(?:년|개월|월|일)|\d+\s*일\s*이내|\d+\s*개월\s*이내|\d+\s*년\s*이내|[①②③④⑤⑥⑦⑧⑨⑩][^.\n]{0,120}(?:기간|기한|이내|초과|이상|미만))/g;
+      const conditionPattern = /(만\s*\d+\s*세[^.\n]*|초등학교\s*\d+\s*학년[^.\n]*|경우[^.\n]*|신청[^.\n]*|허가[^.\n]*|요청[^.\n]*|대상[^.\n]*)/g;
+      const exceptionPattern = /(다만[^.\n]*|단,[^.\n]*|제외[^.\n]*|예외[^.\n]*|초과[^.\n]*|불구하고[^.\n]*)/g;
+      const obligations = sentences.filter((sentence) => /(해야 한다|하여야 한다|할 수 있다|신청할 수 있고|허가해야 한다|명할 수 있다)/.test(sentence));
+
+      return {
+        periods: [...new Set((text.match(periodPattern) || []).map(normalizeText))].slice(0, 5),
+        conditions: [...new Set((text.match(conditionPattern) || []).map(normalizeText))]
+          .filter((item) => item.length >= 12 && item.length <= 150 && !/^(허가|신청|요청)해야 한다$/.test(item))
+          .slice(0, 5),
+        exceptions: [...new Set((text.match(exceptionPattern) || []).map(normalizeText))].slice(0, 5),
+        obligations: obligations.slice(0, 4)
+      };
+    }
+
+    function rankSignals(items, queryTokens, preferredWords = []) {
+      return [...new Set(items.map(normalizeText).filter(Boolean))]
+        .map((item, index) => {
+          const lower = item.toLowerCase();
+          let score = 0;
+          queryTokens.forEach((token) => {
+            if (lower.includes(token.toLowerCase())) score += token.length >= 3 ? 5 : 2;
+          });
+          preferredWords.forEach((word) => {
+            if (item.includes(word)) score += 8;
+          });
+          if (/(이내|초과|이상|미만)/.test(item)) score += 3;
+          if (item.length > 95) score -= 2;
+          return { item, score, index };
+        })
+        .sort((a, b) => b.score - a.score || a.index - b.index)
+        .map((entry) => entry.item);
+    }
+
+    function rankConditions(items) {
+      return [...items].sort((a, b) => {
+        const score = (item) => {
+          let value = 0;
+          if (/(만\s*\d+\s*세|초등학교|자녀|양육)/.test(item)) value += 20;
+          if (/(신청|임신|출산|복직)/.test(item)) value += 8;
+          if (/(기간은|채용 기간|쪽 정보|2025)/.test(item)) value -= 12;
+          if (item.length > 90) value -= 4;
+          return value;
+        };
+        return score(b) - score(a);
+      });
+    }
+
+    function compareRevisionSignals(results) {
+      const byTitle = new Map();
+      results.forEach((result) => {
+        const key = result.title.replace(/\s+/g, "");
+        if (!byTitle.has(key)) byTitle.set(key, []);
+        byTitle.get(key).push(result);
+      });
+
+      const comparisons = [];
+      byTitle.forEach((items) => {
+        const revisions = [...new Set(items.map((item) => item.revision))].sort();
+        if (revisions.length >= 2) {
+          comparisons.push(`${items[0].title}은 ${revisions[0]}부터 ${revisions[revisions.length - 1]}까지 여러 개정본에서 확인됩니다.`);
+        }
+      });
+      return comparisons.slice(0, 3);
+    }
+
+    function buildReasoning(question, results, queryTokens) {
+      const intent = inferIntent(question);
+      const lead = results[0];
+      const supporting = results.slice(0, 3);
+      const combinedSignals = supporting.reduce((acc, result) => {
+        const signals = extractSignals(result.text);
+        acc.periods.push(...signals.periods);
+        acc.conditions.push(...signals.conditions);
+        acc.exceptions.push(...signals.exceptions);
+        acc.obligations.push(...signals.obligations);
+        return acc;
+      }, { periods: [], conditions: [], exceptions: [], obligations: [] });
+
+      const unique = (items) => [...new Set(items.map(normalizeText).filter(Boolean))];
+      const periods = rankSignals(unique(combinedSignals.periods), queryTokens, ["육아휴직", "휴직", "기간", "기한"]).slice(0, 4);
+      const conditions = rankConditions(rankSignals(unique(combinedSignals.conditions), queryTokens, ["자녀", "양육", "신청", "경우"])).slice(0, 4);
+      const exceptions = rankSignals(unique(combinedSignals.exceptions), queryTokens, ["다만", "초과", "제외"]).slice(0, 4);
+      const obligations = rankSignals(unique(combinedSignals.obligations), queryTokens, ["할 수 있다", "해야 한다", "허가"]).slice(0, 4);
+      const comparisons = compareRevisionSignals(results);
+
+      const steps = [
+        `질문을 ${intent.join(", ")} 문제로 분류했습니다.`,
+        `${lead.title}이 질문어와 가장 많이 겹치므로 1차 근거로 사용했습니다.`,
+        periods.length
+          ? `기간/기한 표현은 ${periods.slice(0, 2).join(" / ")}를 우선 적용했습니다.`
+          : "명시적인 기간 표현이 약해 관련 조문 문장을 그대로 제시했습니다.",
+        conditions.length
+          ? `적용 조건은 ${conditions.slice(0, 2).join(" / ")}를 확인했습니다.`
+          : "별도 조건은 검색된 근거 안에서 뚜렷하게 추출되지 않았습니다."
+      ];
+
+      if (exceptions.length) steps.push(`예외 또는 단서는 ${exceptions.slice(0, 2).join(" / ")}를 함께 확인해야 합니다.`);
+      if (comparisons.length) steps.push(...comparisons);
+
+      const conclusionParts = [];
+      if (conditions.length && periods.length) {
+        conclusionParts.push(`${conditions[0]}에 해당하면 ${periods[0]}가 핵심 기준입니다.`);
+      } else if (obligations.length) {
+        conclusionParts.push(trimAroundMatch(obligations[0], queryTokens, 260));
+      }
+      if (periods.length) conclusionParts.push(`핵심 기간/기한: ${periods[0]}`);
+      if (!conclusionParts.length) conclusionParts.push(bestExtract(lead, queryTokens));
+
+      return {
+        intent,
+        primaryRule: lead.title,
+        confidence: lead.score >= 120 ? "높음" : lead.score >= 70 ? "보통" : "낮음",
+        steps,
+        periods,
+        conditions,
+        exceptions,
+        conclusion: conclusionParts.join("\n")
+      };
+    }
+
+    function composeAnswer(results, queryTokens, reasoning) {
+      const lead = results[0];
+      const second = results[1];
+      const leadText = reasoning && reasoning.conclusion ? reasoning.conclusion : bestExtract(lead, queryTokens);
+      const lines = [
+        leadText,
+        "",
+        `가장 관련성이 높은 근거는 ${lead.title}입니다.`
+      ];
+
+      if (second && second.score >= lead.score * .72 && second.title !== lead.title) {
+        lines.push(`함께 확인할 조문은 ${second.title}입니다.`);
+      }
+
+      return lines.join("\n");
+    }
+
+    function renderReasoning(reasoning, queryTokens) {
+      const detailItems = [
+        ...reasoning.periods.map((item) => `기간/기한: ${item}`),
+        ...reasoning.conditions.map((item) => `조건: ${item}`),
+        ...reasoning.exceptions.map((item) => `예외/단서: ${item}`)
+      ].slice(0, 8);
+
+      return `
+        <section class="reasoning" aria-label="판단 과정">
+          <h3>판단 과정</h3>
+          <div class="reasoning-grid">
+            <div class="reasoning-cell">
+              <span class="reasoning-label">질문 유형</span>
+              <span class="reasoning-value">${escapeHtml(reasoning.intent.join(", "))}</span>
+            </div>
+            <div class="reasoning-cell">
+              <span class="reasoning-label">우선 적용 조문</span>
+              <span class="reasoning-value">${escapeHtml(reasoning.primaryRule)}</span>
+            </div>
+            <div class="reasoning-cell">
+              <span class="reasoning-label">신뢰도</span>
+              <span class="reasoning-value">${escapeHtml(reasoning.confidence)}</span>
+            </div>
+          </div>
+          <ol>${reasoning.steps.map((step) => `<li>${highlight(step, queryTokens)}</li>`).join("")}</ol>
+          ${detailItems.length ? `<ul>${detailItems.map((item) => `<li>${highlight(item, queryTokens)}</li>`).join("")}</ul>` : ""}
+        </section>
+      `;
+    }
+
+    function contextForModel(results, queryTokens) {
+      return results.slice(0, 4).map((result, index) => ({
+        id: index + 1,
+        title: result.title,
+        source: result.source,
+        revision: result.revision,
+        pages: pageLabel(result),
+        excerpt: trimAroundMatch(bestExtract(result, queryTokens), queryTokens, 2700)
+      }));
+    }
+
+    async function requestAiReasoning(question, results, localReasoning) {
+      const response = await fetch("api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question,
+          local_reasoning: {
+            intent: localReasoning.intent,
+            primary_rule: localReasoning.primaryRule,
+            extracted_periods: localReasoning.periods,
+            extracted_conditions: localReasoning.conditions,
+            extracted_exceptions: localReasoning.exceptions
+          },
+          context: contextForModel(results, tokenize(question))
+        })
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload.answer) {
+        throw new Error(payload.error || "AI 추론 응답을 받을 수 없습니다.");
+      }
+      return payload;
+    }
+
+    function applyAiAnswer(payload, queryTokens) {
+      const answerBubble = messages.querySelector(".bubble.assistant.answer");
+      if (!answerBubble) return;
+      const steps = Array.isArray(payload.reasoning_steps) && payload.reasoning_steps.length
+        ? `\n\n판단 요약\n${payload.reasoning_steps.map((step, index) => `${index + 1}. ${step}`).join("\n")}`
+        : "";
+      const caveats = Array.isArray(payload.caveats) && payload.caveats.length
+        ? `\n\n확인 필요\n${payload.caveats.map((item) => `- ${item}`).join("\n")}`
+        : "";
+      answerBubble.innerHTML = `${highlight(payload.answer + steps + caveats, queryTokens)}<p class="ai-note">OpenAI Responses API로 근거 조문만 전달해 생성한 답변입니다.</p>`;
+      renderUsageCost(payload.usage_cost);
+      renderOpenAiInput(payload.openai_request);
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat("en-US").format(Number(value || 0));
+    }
+
+    function formatUsd(value) {
+      return `$${Number(value || 0).toFixed(5)}`;
+    }
+
+    function renderUsageCost(usageCost) {
+      const turn = messages.querySelector(".turn");
+      const answerBubble = messages.querySelector(".bubble.assistant.answer");
+      if (!turn || !answerBubble || !usageCost) return;
+      const existing = turn.querySelector(".usage-cost");
+      if (existing) existing.remove();
+
+      const rates = usageCost.rates_per_million || {};
+      const card = document.createElement("section");
+      card.className = "usage-cost";
+      card.setAttribute("aria-label", "API token usage and cost");
+      card.innerHTML = `
+        <div>
+          <span class="usage-label">Input Tokens</span>
+          <span class="usage-value">${formatNumber(usageCost.input_tokens)}</span>
+        </div>
+        <div>
+          <span class="usage-label">Output Tokens</span>
+          <span class="usage-value">${formatNumber(usageCost.output_tokens)}</span>
+        </div>
+        <div>
+          <span class="usage-label">Total Tokens</span>
+          <span class="usage-value">${formatNumber(usageCost.total_tokens)}</span>
+        </div>
+        <div>
+          <span class="usage-label">Estimated Cost</span>
+          <span class="usage-value">${formatUsd(usageCost.total_cost)}</span>
+        </div>
+        <div class="usage-wide">
+          Model ${escapeHtml(usageCost.model || "")}; rates per 1M tokens: input ${formatUsd(rates.input)}, cached input ${formatUsd(rates.cached_input)}, output ${formatUsd(rates.output)}.
+        </div>
+      `;
+      answerBubble.insertAdjacentElement("afterend", card);
+    }
+
+    function showAiError(message) {
+      const answerBubble = messages.querySelector(".bubble.assistant.answer");
+      if (!answerBubble || answerBubble.querySelector(".ai-note")) return;
+      const note = document.createElement("p");
+      note.className = "ai-note error";
+      note.textContent = `AI 추론 비활성: ${message}`;
+      answerBubble.appendChild(note);
+    }
+
+    function renderOpenAiInput(openaiRequest) {
+      const turn = messages.querySelector(".turn");
+      const answerBubble = messages.querySelector(".bubble.assistant.answer");
+      if (!turn || !answerBubble || !openaiRequest) return;
+      const existing = turn.querySelector(".api-input");
+      if (existing) existing.remove();
+
+      const panel = document.createElement("details");
+      panel.className = "api-input";
+      panel.innerHTML = `
+        <summary>OpenAI API 입력</summary>
+        <pre>${escapeHtml(JSON.stringify(openaiRequest, null, 2))}</pre>
+      `;
+
+      const reasoning = turn.querySelector(".reasoning");
+      if (reasoning) {
+        turn.insertBefore(panel, reasoning);
+      } else {
+        answerBubble.insertAdjacentElement("afterend", panel);
+      }
+    }
+
+    function pageLabel(result) {
+      if (!result.pages.length) return "쪽 정보 없음";
+      if (result.pages.length === 1) return `${result.pages[0]}쪽`;
+      return `${result.pages[0]}-${result.pages[result.pages.length - 1]}쪽`;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function highlight(text, tokens) {
+      const targets = tokens
+        .filter((token) => token.length >= 2)
+        .sort((a, b) => b.length - a.length)
+        .slice(0, 20);
+      const lower = text.toLowerCase();
+      const ranges = [];
+
+      targets.forEach((token) => {
+        const needle = token.toLowerCase();
+        let start = lower.indexOf(needle);
+        while (start >= 0) {
+          const end = start + needle.length;
+          if (!ranges.some((range) => start < range.end && end > range.start)) {
+            ranges.push({ start, end });
+          }
+          start = lower.indexOf(needle, end);
+        }
+      });
+
+      if (!ranges.length) return escapeHtml(text);
+      ranges.sort((a, b) => a.start - b.start);
+
+      let html = "";
+      let cursor = 0;
+      ranges.forEach((range) => {
+        html += escapeHtml(text.slice(cursor, range.start));
+        html += `<mark>${escapeHtml(text.slice(range.start, range.end))}</mark>`;
+        cursor = range.end;
+      });
+      return html + escapeHtml(text.slice(cursor));
+    }
+
+    function renderEmpty(message) {
+      messages.innerHTML = `<div class="empty">${escapeHtml(message)}</div>`;
+    }
+
+    function renderAnswer(question, results, queryTokens) {
+      if (!question.trim()) {
+        answerCount.textContent = "질문을 입력하세요";
+        renderEmpty("이 폴더의 인사규정 Markdown 파일을 검색해 답변과 근거를 표시합니다.");
+        return;
+      }
+
+      if (!results.length) {
+        answerCount.textContent = "근거 없음";
+        messages.innerHTML = `
+          <div class="turn">
+            <div class="bubble user">${escapeHtml(question)}</div>
+            <div class="bubble assistant">관련 근거를 찾지 못했습니다. 다른 표현이나 조문명을 포함해 다시 질문해 주세요.</div>
+          </div>
+        `;
+        return;
+      }
+
+      answerCount.textContent = `${results.length}개 근거`;
+      const reasoning = buildReasoning(question, results, queryTokens);
+      const answer = composeAnswer(results, queryTokens, reasoning);
+      const evidence = results.map((result, index) => {
+        const snippet = bestExtract(result, queryTokens);
+        return `
+          <article class="evidence" data-evidence>
+            <button type="button" aria-expanded="false">
+              <div class="evidence-title">
+                <div>
+                  <h3>${escapeHtml(result.title)}</h3>
+                  <p class="source">${escapeHtml(result.source)} · 개정 ${escapeHtml(result.revision)} · ${pageLabel(result)}</p>
+                </div>
+                <div class="score">관련도 ${Math.round(result.score)}<br>원문 보기</div>
+              </div>
+            </button>
+            <p class="snippet">${highlight(snippet, queryTokens)}</p>
+            <div class="full">${highlight(result.text, queryTokens)}</div>
+          </article>
+        `;
+      }).join("");
+
+      messages.innerHTML = `
+        <div class="turn">
+          <div class="bubble user">${escapeHtml(question)}</div>
+          <div class="bubble assistant answer">${highlight(answer, queryTokens)}</div>
+          ${renderReasoning(reasoning, queryTokens)}
+          <div class="evidence-list">${evidence}</div>
+          <p class="notice">이 페이지는 브라우저에서 Markdown 지식베이스를 검색해 답변을 구성합니다. 최종 판단 전 원문과 관련 세칙을 확인하세요.</p>
+        </div>
+      `;
+    }
+
+    async function answerQuestion() {
+      const question = questionInput.value;
+      const queryTokens = tokenize(question);
+      const selectedRevision = revisionSelect.value;
+      const limit = Number(limitSelect.value || 4);
+      const pool = state.chunks.filter((chunk) => selectedRevision === "all" || chunk.revision === selectedRevision);
+
+      const results = pool
+        .map((chunk) => ({ ...chunk, score: scoreChunk(chunk, queryTokens, question) }))
+        .filter((chunk) => chunk.score > 0)
+        .sort((a, b) => b.score - a.score || b.revision.localeCompare(a.revision))
+        .slice(0, limit);
+
+      renderAnswer(question, results, queryTokens);
+      if (!question.trim() || !results.length) return;
+
+      const localReasoning = buildReasoning(question, results, queryTokens);
+      thinking.classList.add("is-active");
+      try {
+        const payload = await requestAiReasoning(question, results, localReasoning);
+        applyAiAnswer(payload, queryTokens);
+      } catch (error) {
+        showAiError(error.message);
+      } finally {
+        thinking.classList.remove("is-active");
+      }
+    }
+
+    function populateControls() {
+      const revisions = state.documents
+        .map((doc) => ({ revision: doc.revision, file: doc.file }))
+        .sort((a, b) => b.revision.localeCompare(a.revision));
+      state.latestRevision = revisions[0] ? revisions[0].revision : "";
+
+      revisionSelect.innerHTML = [
+        '<option value="all">전체 자료</option>',
+        ...revisions.map((doc) => `<option value="${doc.revision}">${doc.revision} · ${escapeHtml(doc.file.replace(/\.hwpforge\.md$/, ""))}</option>`)
+      ].join("");
+
+      quickQuestionBox.innerHTML = quickQuestions
+        .map((question) => `<button type="button" data-question="${escapeHtml(question)}">${escapeHtml(question)}</button>`)
+        .join("");
+    }
+
+    async function loadData() {
+      try {
+        const documents = await Promise.all(KNOWLEDGE_FILES.map(async (file) => {
+          const response = await fetch(`data/${encodeURIComponent(file)}`);
+          if (!response.ok) throw new Error(`${file} 로드 실패`);
+          const text = await response.text();
+          return { text, file, source_file: file, revision: revisionKey(file) };
+        }));
+
+        state.documents = documents;
+        state.chunks = documents.flatMap(splitDocument);
+        populateControls();
+
+        loadStatus.textContent = `최신 자료 ${state.latestRevision}`;
+        metrics.innerHTML = `
+          <span>${state.documents.length}개 Markdown 파일</span>
+          <span>${state.chunks.length}개 검색 단위</span>
+        `;
+
+        const initial = new URLSearchParams(window.location.search).get("q");
+        if (initial) {
+          questionInput.value = initial;
+          answerQuestion();
+        }
+      } catch (error) {
+        loadStatus.textContent = "자료 로드 실패";
+        metrics.innerHTML = `<span>${escapeHtml(error.message)}</span>`;
+        renderEmpty(error.message);
+      }
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      answerQuestion();
+    });
+
+    document.querySelector("#clear").addEventListener("click", () => {
+      questionInput.value = "";
+      renderAnswer("", [], []);
+      questionInput.focus();
+    });
+
+    quickQuestionBox.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-question]");
+      if (!button) return;
+      questionInput.value = button.dataset.question;
+      answerQuestion();
+    });
+
+    messages.addEventListener("click", (event) => {
+      const button = event.target.closest(".evidence button");
+      if (!button) return;
+      const item = button.closest(".evidence");
+      const open = item.classList.toggle("is-open");
+      button.setAttribute("aria-expanded", String(open));
+      const score = button.querySelector(".score");
+      if (score) score.innerHTML = `${score.innerHTML.split("<br>")[0]}<br>${open ? "원문 닫기" : "원문 보기"}`;
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
